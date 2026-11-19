@@ -1,1 +1,2 @@
-// Secure IPC bridge placeholder. Provider credentials must be handled by the main process and OS secure storage.
+const {contextBridge,ipcRenderer}=require('electron');
+contextBridge.exposeInMainWorld('retrovault',{retroAchievements:{status:()=>ipcRenderer.invoke('ra:status'),saveCredentials:(credentials)=>ipcRenderer.invoke('ra:save',credentials),clearCredentials:()=>ipcRenderer.invoke('ra:clear'),testConnection:()=>ipcRenderer.invoke('ra:test'),searchConsoleGames:(consoleId)=>ipcRenderer.invoke('ra:games',consoleId),getGameProgress:(gameId)=>ipcRenderer.invoke('ra:progress',gameId)}});
