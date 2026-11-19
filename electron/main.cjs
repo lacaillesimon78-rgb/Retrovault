@@ -1,4 +1,6 @@
 const {app,BrowserWindow,ipcMain,safeStorage}=require('electron');
+const database=require('./database.cjs');
+const providers=require('./providers.cjs');
 const path=require('node:path');
 const fs=require('node:fs');
 const CREDENTIALS_FILE=()=>path.join(app.getPath('userData'),'retroachievements.enc');
@@ -12,6 +14,8 @@ ipcMain.handle('ra:test',async()=>{const c=readCredentials();if(!c)throw new Err
 ipcMain.handle('ra:systems',async()=>{const cacheFile=path.join(app.getPath('userData'),'ra-systems.json');try{const cached=JSON.parse(fs.readFileSync(cacheFile,'utf8'));if(Date.now()-cached.savedAt<30*24*60*60*1000)return cached.systems;}catch{}const systems=await raRequest('API_GetConsoleIDs.php',{a:1,g:1});fs.writeFileSync(cacheFile,JSON.stringify({savedAt:Date.now(),systems}),{mode:0o600});return systems;});
 ipcMain.handle('ra:games',async(_event,consoleId)=>{const id=Number(consoleId);if(!Number.isInteger(id)||id<1||id>10000)throw new Error('Enter a valid RetroAchievements console ID.');const cacheFile=path.join(app.getPath('userData'),'ra-games-'+id+'.json');try{const cached=JSON.parse(fs.readFileSync(cacheFile,'utf8'));if(Date.now()-cached.savedAt<30*24*60*60*1000)return cached.games;}catch{}const games=await raRequest('API_GetGameList.php',{i:id,f:1,h:0,o:0});fs.writeFileSync(cacheFile,JSON.stringify({savedAt:Date.now(),games}),{mode:0o600});return games;});
 ipcMain.handle('ra:progress',async(_event,gameId)=>{const id=Number(gameId);if(!Number.isInteger(id)||id<1)throw new Error('Enter a valid RetroAchievements game ID.');const credentials=readCredentials();return await raRequest('API_GetGameInfoAndUserProgress.php',{g:id,u:credentials.username});});
+ipcMain.handle('db:load-games',()=>database.listGames());ipcMain.handle('db:save-games',(_e,rows)=>database.saveGames(rows));ipcMain.handle('db:load-achievements',()=>database.listAchievements());ipcMain.handle('db:save-achievements',(_e,rows)=>database.saveAchievements(rows));
+ipcMain.handle('steam:status',()=>providers.steamStatus());ipcMain.handle('steam:save',(_e,input)=>providers.saveSteam(input));ipcMain.handle('steam:test',()=>providers.steamTest());ipcMain.handle('steam:games',()=>providers.steamGames());ipcMain.handle('steam:achievements',(_e,id)=>providers.steamAchievements(id));ipcMain.handle('system:emulators',()=>providers.detectEmulators());
 function createWindow(){const win=new BrowserWindow({width:1440,height:920,minWidth:1024,minHeight:700,backgroundColor:'#0b0d14',title:'Retrovault',webPreferences:{preload:path.join(__dirname,'preload.cjs'),contextIsolation:true,nodeIntegration:false,sandbox:true}});if(!app.isPackaged)win.loadURL(process.env.VITE_DEV_SERVER_URL||'http://127.0.0.1:5173');else win.loadFile(path.join(__dirname,'../dist/index.html'));}
 app.whenReady().then(()=>{createWindow();app.on('activate',()=>{if(BrowserWindow.getAllWindows().length===0)createWindow();});});
 app.on('window-all-closed',()=>{if(process.platform!=='darwin')app.quit();});
