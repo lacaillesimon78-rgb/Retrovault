@@ -4,10 +4,10 @@ Universal game library and achievement tracker for desktop. The catalogue now st
 
 ## Current preview features
 - Electron desktop shell with isolated renderer and a narrow preload bridge
-- Game library: add, search, filter by platform, track status and playtime, export JSON
+- Game library: add, search, filter by platform, track status and playtime, full JSON backup and restore (library plus achievements)
 - Platform browser with 129 starter systems
-- Custom achievements: create milestones for any game, set point values, unlock/relock, and delete
-- RetroAchievements account connection, encrypted API-key storage via Electron safeStorage, connection test, console game-list lookup, and per-game progress inspection
+- Unified achievements: create manual milestones and import RetroAchievements definitions and unlock dates into a matched library game
+- RetroAchievements account connection, encrypted API-key storage via Electron safeStorage, connection test, console game-list lookup, per-game progress inspection, and manual achievement import into the unified tracker
 - Cached RetroAchievements console game lists (30-day cache) to avoid repeatedly downloading large, mostly static catalogues
 - Overview, library, achievements, platforms, statistics, and settings screens
 
@@ -32,7 +32,7 @@ The API key is encrypted by Electron's OS-backed secure storage in the main proc
 
 ## Important scope notes
 - Custom achievements are local/manual records; they are not sent to RetroAchievements.
-- RetroAchievements lookup currently retrieves game lists and user progress for inspection. Automatic game matching, importing achievement definitions/unlocks into the unified tracker, and background sync are still in progress.
+- RetroAchievements lookup currently retrieves game lists and user progress for inspection. Game matching is currently a deliberate manual selection during import to prevent incorrect matches. Automatic matching and background sync remain in progress. Imported records are deduplicated by library game and RetroAchievements achievement ID.
 - PlayStation, Xbox, Steam, and GOG provider integrations are not implemented yet. They require separate provider-specific authentication and supported APIs.
 - Consoles without an achievement service can use custom achievements.
 
@@ -40,7 +40,7 @@ The API key is encrypted by Electron's OS-backed secure storage in the main proc
 1. Match library games to provider game IDs and import RetroAchievements achievement definitions and unlock timestamps.
 2. Add automatic/manual sync controls, rate-limit handling, and offline caching for achievement data.
 3. Add SQLite persistence and schema migrations for the library, platform catalogue, achievements, and provider mappings.
-4. Add import/restore and scheduled backups.
+4. Add scheduled backups and more granular restore/merge options.
 5. Add native provider adapters where supported and permitted: PlayStation Network, Xbox, Steam, and GOG.
 6. Expand the catalogue with aliases, regional variants, metadata IDs, user-defined platforms, and importable community datasets.
 7. Add emulator/library detection and desktop installers with signed updates.
