@@ -1,0 +1,1 @@
+// Secure IPC bridge placeholder. Provider credentials must be handled by the main process and OS secure storage.
