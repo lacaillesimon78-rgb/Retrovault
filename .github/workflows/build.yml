@@ -1,7 +1,7 @@
 name: Build Retrovault
 on:
   push:
-    branches: [main, feature/universal-game-tracker]
+    branches: [main, feature/universal-game-tracker, feature/complete-roadmap]
   pull_request:
     branches: [main]
 jobs:
